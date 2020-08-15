@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Coronavirus Vaccine Watch</title>
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+            integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="./css/styles.css" />
+    </head>
+    <body>
+        <div id="root">
+            <div class="d-flex justify-content-center mt-5">
+                <img
+                    src="../icons/icon.png"
+                    class="coronavirus-icon"
+                    alt="It's not the real coronavirus"
+                />
+            </div>
+            <div class="title display-1 text-center mt-1 font-custom-light">
+                Coronavirus Vaccine Watch
+            </div>
+            <div class="mt-1 mb-2 text-center lead">
+                The legendary race of the century
+            </div>
+
+            <div
+                class="container-fluid d-flex flex-wrap justify-content-center"
+            >
+                <div class="card-group">
+                    <div
+                        class="card bg-dark text-white mb-2"
+                        style="width: 210px;"
+                    >
+                        <div
+                            class="card-header text-uppercase text-center font-custom-monospace h5"
+                        >
+                            preclinical
+                        </div>
+                        <div class="card-body text-center">
+                            <span
+                                id="preclinicalVaccines"
+                                class="display-1 font-custom-monospace"
+                            >
+                                0
+                            </span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card bg-warning text-white mb-2"
+                        style="width: 210px;"
+                    >
+                        <div
+                            class="card-header text-uppercase text-center font-custom-monospace h5"
+                        >
+                            phase 1
+                        </div>
+                        <div class="card-body text-center">
+                            <span
+                                id="phase1Vaccines"
+                                class="display-1 font-custom-monospace"
+                            >
+                                0
+                            </span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card bg-info text-white mb-2"
+                        style="width: 210px;"
+                    >
+                        <div
+                            class="card-header text-uppercase text-center font-custom-monospace h5"
+                        >
+                            phase 2
+                        </div>
+                        <div class="card-body text-center">
+                            <span
+                                id="phase2Vaccines"
+                                class="display-1 font-custom-monospace"
+                            >
+                                0
+                            </span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card bg-primary text-white mb-2"
+                        style="width: 210px;"
+                    >
+                        <div
+                            class="card-header text-uppercase text-center font-custom-monospace h5"
+                        >
+                            phase 3
+                        </div>
+                        <div class="card-body text-center">
+                            <span
+                                id="phase3Vaccines"
+                                class="display-1 font-custom-monospace"
+                            >
+                                0
+                            </span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card bg-success text-white mb-2"
+                        style="width: 210px;"
+                    >
+                        <div
+                            class="card-header text-uppercase text-center font-custom-monospace h5"
+                        >
+                            approval
+                        </div>
+                        <div class="card-body text-center">
+                            <span
+                                id="approvalVaccines"
+                                class="display-1 font-custom-monospace"
+                            >
+                                0
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container text-center">
+                <span id="update-state">
+                    Automatic update on
+                    <span id="seconds">10</span>
+                    seconds.
+                </span>
+            </div>
+        </div>
+        <script>
+            const notifier = require('node-notifier');
+            const path = require('path');
+
+            const phases = [
+                'preclinicalVaccines',
+                'phase1Vaccines',
+                'phase2Vaccines',
+                'phase3Vaccines',
+                'approvalVaccines',
+            ];
+
+            let vaccinesPrevState = {};
+
+            let vaccinesState = {};
+
+            function getVaccineProgress() {
+                let result = [];
+
+                for (let state in phases) {
+                    if (
+                        vaccinesState[phases[state]] !=
+                        vaccinesPrevState[phases[state]]
+                    ) {
+                        result = [phases[state], vaccinesState[phases[state]]];
+                    }
+                }
+                return result;
+            }
+
+            function getGoodNews() {
+                if (getVaccineProgress().length != 0) {
+                    let newVaccineProgress = getVaccineProgress();
+                    let newPhase = newVaccineProgress[0];
+                    let newPhaseQuantity = newVaccineProgress[1];
+
+                    let resultProgress = `Good news! There are now ${newPhaseQuantity} vaccines in phase ${newPhase}`;
+
+                    notifier.notify({
+                        title: 'Great!',
+                        message: resultProgress,
+                        icon: path.join(__dirname, '../icons/icon.png'),
+                        appID: 'Coronavirus Vaccine Watch',
+                    });
+                }
+            }
+
+            let preclinicalVaccines = 0;
+            let phase1Vaccines = 0;
+            let phase2Vaccines = 0;
+            let phase3Vaccines = 0;
+            let approvalVaccines = 0;
+
+            let page = '';
+
+            let preclinicalRegExp = new RegExp(
+                /<p class="g-pstyle1">(.+)<\/p>/
+            );
+
+            let phase1RegExp = new RegExp(/<p class="g-pstyle2">(.+)<\/p>/);
+            let phase2RegExp = new RegExp(/<p class="g-pstyle2">(.+)<\/p>/);
+            let globalPhasesRegExp = new RegExp(
+                /<p class="g-pstyle2">(.+)<\/p>/g
+            );
+
+            function getPreclinical(page) {
+                return Number(preclinicalRegExp.exec(page)[1]);
+            }
+
+            function getPhase1(page) {
+                return Number(
+                    phase1RegExp.exec(page.match(globalPhasesRegExp)[0])[1]
+                );
+            }
+
+            function getPhase2(page) {
+                return Number(
+                    phase1RegExp.exec(page.match(globalPhasesRegExp)[1])[1]
+                );
+            }
+
+            function getPhase3(page) {
+                return Number(
+                    phase1RegExp.exec(page.match(globalPhasesRegExp)[2])[1]
+                );
+            }
+
+            function getApproval(page) {
+                return Number(
+                    phase1RegExp.exec(page.match(globalPhasesRegExp)[3])[1]
+                );
+            }
+
+            const NewsURL =
+                'https://www.nytimes.com/interactive/2020/science/coronavirus-vaccine-tracker.html';
+
+            // TODO: Look for other resources
+            // https://www.covid-19vaccinetracker.org/
+            // https://biorender.com/covid-vaccine-tracker
+
+            let firstTimeLoaded = true;
+
+            function updateDataNYTimes() {
+                fetch(NewsURL)
+                    .then((response) => {
+                        return response.text();
+                    })
+                    .then((data) => {
+                        page = data;
+                    })
+                    .then(() => {
+                        // Asignamos el nuevo estado
+                        vaccinesState.preclinicalVaccines = getPreclinical(
+                            page
+                        );
+                        vaccinesState.phase1Vaccines = getPhase1(page);
+                        vaccinesState.phase2Vaccines = getPhase2(page);
+                        vaccinesState.phase3Vaccines = getPhase3(page);
+                        vaccinesState.approvalVaccines = getApproval(page);
+
+                        if (firstTimeLoaded) {
+                            vaccinesPrevState = vaccinesState;
+                            firstTimeLoaded = false;
+                        }
+
+                        getGoodNews();
+
+                        vaccinesPrevState = vaccinesState;
+
+                        document.querySelector(
+                            '#preclinicalVaccines'
+                        ).innerText = vaccinesState.preclinicalVaccines;
+                        document.querySelector('#phase1Vaccines').innerText =
+                            vaccinesState.phase1Vaccines;
+                        document.querySelector('#phase2Vaccines').innerText =
+                            vaccinesState.phase2Vaccines;
+                        document.querySelector('#phase3Vaccines').innerText =
+                            vaccinesState.phase3Vaccines;
+                        document.querySelector('#approvalVaccines').innerText =
+                            vaccinesState.approvalVaccines;
+                    });
+            }
+
+            window.onload = function () {
+                timer();
+            };
+
+            updateDataNYTimes();
+
+            let seconds = 0;
+            function timer() {
+                seconds++;
+                document.querySelector('#seconds').innerText = 10 - seconds;
+
+                if (seconds % 10 == 0) {
+                    document.querySelector('#update-state').innerText =
+                        'Updating...';
+                    updateDataNYTimes();
+                    document.querySelector(
+                        '#update-state'
+                    ).innerHTML = `Automatic update on
+                                        <span id="seconds">10</span>
+                                        seconds.`;
+                    seconds = 0;
+                }
+            }
+
+            setInterval('timer()', 1000);
+        </script>
+    </body>
+</html>

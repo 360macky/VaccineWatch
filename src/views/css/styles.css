@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&display=swap');
+
+.font-custom-light {
+    font-family: 'Quicksand', sans-serif;
+}
+
+.font-custom-monospace {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.coronavirus-icon {
+    display: block;
+    margin: 0;
+    width: 15%;
+    text-align: center;
+    align-self: center;
+}
+
+.color-custom {
+    color: #34c1ac;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .coronavirus-icon {
+        animation: coronavirus-icon-spin infinite 20s linear;
+    }
+}
+
+@keyframes coronavirus-icon-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
