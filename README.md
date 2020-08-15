@@ -18,3 +18,13 @@
 <img src="./screenshot.jpg" align="center">
 <br />
 <img src="./screenshot_1.jpg" align="center">
+
+## 🚀 Deployment
+📦 Install all the dependencies
+```bash
+npm install
+```
+💉 Run and inject the app
+```bash
+npm start
+```
