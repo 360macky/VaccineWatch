@@ -16,3 +16,5 @@
 </p>
 
 <img src="./screenshot.jpg" align="center">
+<br />
+<img src="./screenshot_1.jpg" align="center">
