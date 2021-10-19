@@ -28,3 +28,6 @@ npm install
 ```bash
 npm start
 ```
+
+# ✍ Authors
+- **@360macky** - I just got vaccinated.
