@@ -14,7 +14,7 @@
   "author": "Marcelo Arias",
   "license": "MIT",
   "dependencies": {
-    "electron": "^9.2.0",
+    "electron": "^11.5.0",
     "node-notifier": "^8.0.0"
   }
 }
